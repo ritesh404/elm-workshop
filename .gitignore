@@ -1,3 +1,5 @@
 elm-stuff
 part-*/elm-stuff
 index.html
+.DS_Store
+part-*/.DS_Store
