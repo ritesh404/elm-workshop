@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html
+-- TODO: Fix the error in this file
 
 main =
-    Html.text "Hello, world!"
+    "Hello, world!"

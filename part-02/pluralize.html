@@ -8,18 +8,6 @@
 </head>
 <body>
     <div id="market"></div>
-    <script>
-            let pluralize =
-                (signular, plural, quantity) => {
-                    if(quantity === 1){
-                        return signular
-                    }else {
-                        return plural
-                    }
-                }
-            
-            const dom = document.getElementById("market");
-            dom.innerText = pluralize("mango", "mangoes", 1);
-        </script>
+    <script type="text/javascript" src="pluralize.js"></script>
 </body>
 </html>
