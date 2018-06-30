@@ -2,10 +2,25 @@ img {
     width: 120px;
     height:120px;
     margin: 5px;
-    border-radius: 50%;
+    border-radius: 10px;
     background-color:#fff;
 }
 
 body{
     background-color: burlywood;
+}
+
+
+.card.flipped {
+    -webkit-transform: rotateY( 180deg );
+    transform: rotateY( 180deg );
+}
+
+.card {
+    -webkit-transition: -webkit-transform 1s;
+    transition: -webkit-transform 1s;
+    transition: transform 1s;
+    transition: transform 1s, -webkit-transform 1s;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
