@@ -6,6 +6,10 @@ img {
     background-color:#fff;
 }
 
+.center{
+    margin: 0 25%;
+}
+
 body{
     background-color: burlywood;
 }
@@ -23,4 +27,20 @@ body{
     transition: transform 1s, -webkit-transform 1s;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
+}
+
+.container{
+    width:120px;
+    height:120px;
+    float: left;
+}
+
+.front{
+    width:120px;
+height:120px;
+}
+
+.card-back{
+    width:120px;
+height:120px;
 }
