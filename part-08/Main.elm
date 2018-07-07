@@ -6,43 +6,32 @@ import Html.Events exposing (..)
 
 {-
 TODOS: 
-Create a type alias for our deck of cards.
-Create a union type for representing the group of a card.
-Add group as a field in our Card type
+
+Create a union type that describes the current gamestate. For example the current state of the game
+can be one of Playing (Player have selected no cards), 
+Guessing (Player has selected one card and is guessing the second one) or Won (When all cards are open)!
+
+Update the model to hold the current deck and the gamestate
+and create a function init that will hold the initial model or state of the game
+
+Add a Reset message which when received on update should reset the game state
+
+
 -}
 
-{-
-TODOS: 
-Move all types and type aliases to the file Model.elm
-A module's name must match it's file name, so in our case Model.elm should start with module Model exposing (..)
-To use our types in Main.elm we also need to import them. 
-This is done in the same way as we import the Html module; import Html exposing (..)
--}
-
-type GameState
-    = Choosing Deck
-    | Matching Deck Card
-    | GameOver
+main : Program Never Model Msg
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = \_ -> Sub.none
+        }
 
 
-type alias Model =
-    { cards : List Card
-    }
 
+-- TYPES
 
-type Msg
-    = CardClicked Card
-    | DeckGenerated Deck
-    | RestartGame
-
-type CardState
-    = Open
-    | Closed
-    | Matched
-
-type Group
-    = A
-    | B
 
 type alias Card =
     { id : String
@@ -50,79 +39,84 @@ type alias Card =
     , state : CardState
     }
 
-type alias Deck =
-    List Card
+type CardState
+    = Open
+    | Closed
+    | Matched
+
+
+type Group
+    = A
+    | B
+
+
+type alias Model =
+    { cards : List Card
+    }
+
+type Msg
+    = CardClicked Card
+
+
+
+-- MODEL
+
+cards : List String
+cards =
+    List.range 1 10
+        |> List.map toString
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( {cards = deck}, Cmd.none )
+
+
+initCard : Group -> String -> Card
+initCard group name =
+    { id = name
+    , group = group
+    , state = Closed
+    }
+
+
+deck : List Card
+deck =
+    let
+        groupA =
+            List.map (initCard A) cards
+
+        groupB =
+            List.map (initCard B) cards
+    in
+        List.concat [ groupA, groupB ]
+
+
+
+-- UPDATE
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    case msg of
+        CardClicked clickedCard ->
+            ({ model 
+                | cards =
+                    List.map
+                        (\c ->
+                            if c.id == clickedCard.id && c.group == clickedCard.group then
+                                (setCard Open clickedCard)
+                            else
+                                c
+                        )
+                        model.cards
+            }, Cmd.none)
 
 setCard : CardState -> Card -> Card
 setCard state card =
     { card | state = state }
 
 
-isMatching : Card -> Card -> Bool
-isMatching c1 c2 =
-    c1.id == c2.id && c1.group /= c2.group
 
-
-closeUnmatched : Deck -> Deck
-closeUnmatched deck =
-    List.map
-        (\c ->
-            if c.state /= Matched then
-                { c | state = Closed }
-            else
-                c
-        )
-        deck
-
-
-allMatched : Deck -> Bool
-allMatched deck =
-    List.all (\c -> c.state == Matched) deck
-
-
-updateCardClick : Card -> GameState -> GameState
-updateCardClick clickedCard game =
-    case game of
-        Choosing deck ->
-            let
-                updatedDeck =
-                    deck
-                        |> closeUnmatched
-                        |> setCard Open clickedCard
-            in
-                Matching updatedDeck clickedCard
-
-        Matching deck openCard ->
-            let
-                updatedDeck =
-                    if isMatching clickedCard openCard then
-                        deck
-                            |> setCard Matched clickedCard
-                            |> setCard Matched openCard
-                    else
-                        setCard Open clickedCard deck
-            in
-                if allMatched updatedDeck then
-                    GameOver
-                else
-                    Choosing updatedDeck
-
-        GameOver ->
-            game
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        CardClicked card ->
-            { model | game = updateCardClick card model.game }
-
-        RestartGame ->
-            init
-
-init : Model
-init =
-    { game = Choosing GameGenerator.staticDeck }
+-- VIEW STUFF
 
 
 viewCard : Card -> Html Msg
@@ -131,7 +125,7 @@ viewCard card =
         Open ->
             img
                 [ class "open"
-                , src ("/assets/" ++ card.id )
+                , src ("/assets/" ++ card.id ++ ".jpeg")
                 ]
                 []
 
@@ -146,7 +140,7 @@ viewCard card =
         Matched ->
             img
                 [ class "matched"
-                , src ("/assets/" ++ card.id )
+                , src ("/assets/" ++ card.id ++ ".jpeg")
                 ]
                 []
 
@@ -154,6 +148,7 @@ viewCard card =
 viewCards : List Card -> Html Msg
 viewCards cards =
     div [] (List.map viewCard cards)
+
 
 
 view : Model -> Html Msg
@@ -164,12 +159,3 @@ view model =
             [ viewCards model.cards
             ]
         ]
-    
-
-main : Program Never Model Msg
-main =
-    Html.beginnerProgram
-        { model = { cards = [ openCard, closedCard, matchedCard ] }
-        , view = view
-        , update = update
-        }

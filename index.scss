@@ -44,3 +44,17 @@ height:120px;
     width:120px;
 height:120px;
 }
+
+
+.you-won{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8em;
+    font-family: fantasy;
+    font-weight: bolder;
+    color: rgb(250, 250, 230);
+    width: 100%;
+    text-align: center;
+}

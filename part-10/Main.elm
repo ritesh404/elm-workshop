@@ -5,19 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
 {-
-TODOS:
-
-Complete the Game!
-All thats left now is to add in the basic logic.
-Hint: the flow is as follows
-Player opens one card
-Player opens second card
-if both cards match then both stay open
-Player has won when all cards are open. Display a friendly message!
-
-Bonus Points:
-Right now the game is quite easy. Add in an element of randomization to spice things up!
-
+Lets play!
 -}
 
 main : Program Never Model Msg
@@ -48,7 +36,7 @@ type CardState
 
 type GameState 
     = Playing
-    | Guessing
+    | Guessing Card
     | Win
 
 type Group
@@ -106,25 +94,60 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         CardClicked clickedCard ->
-            ({ model 
-                | deck =
-                    List.map
-                        (\c ->
-                            if c.id == clickedCard.id && c.group == clickedCard.group then
-                                (setCard Open clickedCard)
-                            else
-                                c
-                        )
-                        model.deck
-            }, Cmd.none)
+            case model.state of
+                Playing ->
+                    ({ model 
+                        | deck =
+                            setCardInDeck Open clickedCard model.deck
+                        , state = Guessing clickedCard
+                    }, Cmd.none)
+
+                Guessing card ->
+                    if card.id == clickedCard.id && card.group /= clickedCard.group then
+                        let
+                            newDeck = setCardInDeck Matched clickedCard model.deck
+                                    |> setCardInDeck Matched card
+                        in
+                            
+                        ({ model 
+                            | deck = newDeck    
+                            , state = 
+                                case isGameOver newDeck of
+                                    True -> Win
+                                    _ -> Playing 
+                        }, Cmd.none)
+                    else
+                        ({ model 
+                            | deck =
+                                setCardInDeck Closed card model.deck
+                            , state = Playing
+                        }, Cmd.none)
+                
+                Win ->
+                    (model, Cmd.none)
+
         
         Reset -> init
+
+
+isGameOver : List Card -> Bool
+isGameOver =
+    List.all (\c -> c.state == Matched ) 
 
 setCard : CardState -> Card -> Card
 setCard state card =
     { card | state = state }
 
-
+setCardInDeck :  CardState -> Card -> List Card -> List Card
+setCardInDeck state card deck =
+    List.map
+        (\c ->
+            if c.id == card.id && c.group == card.group then
+                (setCard state card)
+            else
+                c
+        )
+        deck
 
 -- VIEW STUFF
 
@@ -172,9 +195,9 @@ gameContainer model =
 view : Model -> Html Msg
 view model =
     case model.state of
-        Playing ->
-            gameContainer model
-        Guessing ->
-            gameContainer model
         Win ->
+            div [ class "gameover"] 
+                [ span [class "you-won"] [text "You Won!"]
+                , gameContainer model ]
+        _ ->
             gameContainer model

@@ -6,17 +6,13 @@ import Html.Events exposing (..)
 
 {-
 TODOS: 
-Create a type alias for our deck of cards.
 Create a union type for representing the group of a card.
-Add group as a field in our Card type
--}
 
-{-
-TODOS: 
-Move all types and type aliases to the file Model.elm
-A module's name must match it's file name, so in our case Model.elm should start with module Model exposing (..)
-To use our types in Main.elm we also need to import them. 
-This is done in the same way as we import the Html module; import Html exposing (..)
+Add group as a field in our Card type
+
+Create a function `cards` that will hold all the cards
+
+Create a function `deck` that will create our playing deck
 -}
 
 type alias Model =
