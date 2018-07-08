@@ -7,6 +7,8 @@ import Html.Events exposing (..)
 {-
 TODOS: 
 
+Create a type alias called deck that represents our list of playing cards
+
 Create a union type that describes the current gamestate. For example the current state of the game
 can be one of Playing (Player have selected no cards), 
 Guessing (Player has selected one card and is guessing the second one) or Won (When all cards are open)!
@@ -123,26 +125,22 @@ viewCard : Card -> Html Msg
 viewCard card =
     case card.state of
         Open ->
-            img
-                [ class "open"
-                , src ("/assets/" ++ card.id ++ ".jpeg")
+            div [ class "card-container open" ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
         Closed ->
-            img
-                [ class "closed"
-                , onClick (CardClicked card)
-                , src ("/assets/closed.png")
+            div [ class "card-container closed", onClick (CardClicked card) ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
         Matched ->
-            img
-                [ class "matched"
-                , src ("/assets/" ++ card.id ++ ".jpeg")
+            div [ class "card-container matched" ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
 
 viewCards : List Card -> Html Msg
@@ -154,7 +152,7 @@ viewCards cards =
 view : Model -> Html Msg
 view model =
     div [ class "center" ]
-        [ h1 [] [ text "Memory of Thrones!"]
+        [ h1 [] [ text "Memory Game Of Thrones!"]
         , div [ id "container" ]
             [ viewCards model.cards
             ]

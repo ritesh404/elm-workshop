@@ -37,7 +37,7 @@ viewCard card =
 main : Html msg
 main =
     div [ class "center" ]
-        [ h1 [] [ text "Memory of Thrones!"]
+        [ h1 [] [ text "Memory Game Of Thrones!"]
         , div [ id "container" ]
             [ viewCard card ]
         ]

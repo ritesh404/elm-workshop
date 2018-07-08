@@ -3,13 +3,8 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Random
 
-{-
-TODOS:
-
-Add  shuffle function to shuffle the deck of cards before the game begins
-
--}
 
 main : Program Never Model Msg
 main =
@@ -57,7 +52,7 @@ type alias Model =
 type Msg
     = CardClicked Card
     | Reset
-
+    | Shuffle (List Int)
 
 
 -- MODEL
@@ -71,12 +66,12 @@ cards =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {state = Playing, deck = deck}, Cmd.none )
+    ( {state = Playing, deck = deck}, randomList Shuffle (List.length deck) )
 
 
 initCard : Group -> String -> Card
-initCard group name =
-    { id = name
+initCard group id =
+    { id = id
     , group = group
     , state = Closed
     }
@@ -93,6 +88,11 @@ deck =
     in
         List.concat [ groupA, groupB ]
 
+randomList : (List Int -> Msg) -> Int -> Cmd Msg
+randomList msg len =
+    Random.int 0 100
+        |> Random.list len
+        |> Random.generate msg
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -130,10 +130,19 @@ update msg model =
                 
                 Win ->
                     (model, Cmd.none)
+                
+        Shuffle listOfInts ->
+            ({model | deck = shuffleDeck model.deck listOfInts }, Cmd.none)
 
         
         Reset -> init
 
+
+shuffleDeck : Deck -> List Int -> Deck
+shuffleDeck deck randomInts =
+    List.map2 (,) deck randomInts
+        |> List.sortBy Tuple.second
+        |> List.map Tuple.first
 
 isGameOver : Deck -> Bool
 isGameOver =
@@ -177,7 +186,6 @@ viewCard card =
                 [ img [ class "card", src ("/assets/closed.png")] [] 
                 , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-
 
 
 viewCards : Deck -> Html Msg

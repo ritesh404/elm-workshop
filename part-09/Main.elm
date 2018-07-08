@@ -40,6 +40,8 @@ type alias Card =
     , state : CardState
     }
 
+type alias Deck = List Card
+
 type CardState
     = Open
     | Closed
@@ -58,7 +60,7 @@ type Group
 
 type alias Model = 
     { state : GameState
-    , deck : List Card
+    , deck : Deck
     }
 
 type Msg
@@ -89,7 +91,7 @@ initCard group name =
     }
 
 
-deck : List Card
+deck : Deck
 deck =
     let
         groupA =
@@ -133,29 +135,26 @@ viewCard : Card -> Html Msg
 viewCard card =
     case card.state of
         Open ->
-            img
-                [ class "open"
-                , src ("/assets/" ++ card.id ++ ".jpeg")
+            div [ class "card-container open" ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
         Closed ->
-            img
-                [ class "closed"
-                , onClick (CardClicked card)
-                , src ("/assets/closed.png")
+            div [ class "card-container closed", onClick (CardClicked card) ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
         Matched ->
-            img
-                [ class "matched"
-                , src ("/assets/" ++ card.id ++ ".jpeg")
+            div [ class "card-container matched" ]
+                [ img [ class "card", src ("/assets/closed.png")] [] 
+                , img [ class "card front" , src ("/assets/" ++ card.id ++ ".jpeg")] [] 
                 ]
-                []
 
 
-viewCards : List Card -> Html Msg
+
+viewCards : Deck -> Html Msg
 viewCards cards =
     div [] (List.map viewCard cards)
 
@@ -163,7 +162,7 @@ viewCards cards =
 gameContainer : Model -> Html Msg
 gameContainer model =
     div [ class "center" ]
-                [ h1 [] [ text "Memory of Thrones!"]
+                [ h1 [] [ text "Memory Game Of Thrones!"]
                 , div [ id "container" ]
                     [ viewCards model.deck
                     ]
